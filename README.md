@@ -25,7 +25,7 @@ A config file is needed to run the YOLO model and the parameters can be modified
 
 The following is a recommendation on how best to tune the YOLO model configuration
 
-'''python
+```python
 
 batch = 64
 subdivisions = 16
@@ -35,4 +35,4 @@ max_batches = (# of classes) * 2000 but no less than 6000
 steps = (80% of max_batches), (90% of max_batches)
 filters = (# of classes + 5) * 3
 
-'''
+```
