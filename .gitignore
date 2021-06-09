@@ -1,6 +1,9 @@
+# Built files
+darknet
+
 # Data files
 tools/
-
+data/
 
 
 # Byte-compiled / optimized / DLL files

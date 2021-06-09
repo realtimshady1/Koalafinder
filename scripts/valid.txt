@@ -1,8 +1,8 @@
-../data/obj/00061.jpg
-../data/obj/00083.jpg
-../data/obj/00004.jpg
-../data/obj/00058.jpg
-../data/obj/00036.jpg
-../data/obj/00038.jpg
-../data/obj/00027.jpg
-../data/obj/00069.jpg
+../data/00054.jpg
+../data/00024.jpg
+../data/00002.jpg
+../data/00056.jpg
+../data/00053.jpg
+../data/00063.jpg
+../data/00022.jpg
+../data/00048.jpg

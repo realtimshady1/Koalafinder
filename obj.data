@@ -1,5 +1,5 @@
 classes = 1
-train  = /Koalafinder/data/train.txt
-valid  = /Koalafinder/data/valid.txt
-names = /Koalafinder/data/obj.names
+train  = train.txt
+valid  = valid.txt
+names = obj.names
 backup = backup/
