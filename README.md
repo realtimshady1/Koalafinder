@@ -36,3 +36,18 @@ steps = (80% of max_batches), (90% of max_batches)
 filters = (# of classes + 5) * 3
 
 ```
+
+## Usage
+
+```bash
+git clone https://github.com/AlexeyAB/darknet
+cd darknet
+sed -i 's/OPENCV=0/OPENCV=1/' Makefile
+sed -i 's/GPU=0/GPU=1/' Makefile
+sed -i 's/CUDNN=0/CUDNN=1/' Makefile
+sed -i 's/CUDNN_HALF=0/CUDNN_HALF=1/' Makefile
+
+cd darknet/
+make
+
+```

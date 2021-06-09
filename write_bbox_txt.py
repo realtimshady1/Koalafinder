@@ -8,7 +8,7 @@ from utils import new_directory
 
 def write_bbox_txt(args):
     # create a new obj folder
-    obj_folder = new_directory(args.folder, os.getcwd())
+    obj_folder = new_directory(args.folder, './')
     
     # load csv information
     with open(args.file) as csv_file:
@@ -18,12 +18,16 @@ def write_bbox_txt(args):
             image = frame[0].zfill(5) + '.txt'
     
             # bounding box information
-            bbox = frame[2:7]
-            print(' '.join(bbox))
-    
+            bbox = []
+            bbox.append(frame[2])
+            bbox.append(int(frame[3])/args.width)
+            bbox.append(int(frame[4])/args.width)
+            bbox.append(int(frame[5])/args.height)
+            bbox.append(int(frame[6])/args.height)
+            
             # write row data to text file
-            with open(os.path.join(obj_folder, image), 'a') as f:
-                f.write(' '.join(bbox))
+            with open(os.path.join(obj_folder, image), 'w') as f:
+                f.write(' '.join(map(str,bbox)))
                 f.write('\n')
 
 
@@ -33,6 +37,10 @@ if __name__ == '__main__':
                         type=str)
     parser.add_argument('folder', help="Folder path to contain the outputs",
                         default='obj', type=str)
+    parser.add_argument('-width', help="width of the image",
+                        default=640, type=int)
+    parser.add_argument('-height', help="height of the image",
+                        default=512, type=int)
     
     args = parser.parse_args()
 

@@ -1,8 +1,0 @@
-../data/00054.jpg
-../data/00024.jpg
-../data/00002.jpg
-../data/00056.jpg
-../data/00053.jpg
-../data/00063.jpg
-../data/00022.jpg
-../data/00048.jpg

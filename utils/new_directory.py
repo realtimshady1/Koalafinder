@@ -1,6 +1,4 @@
-from os import listdir
-from os import mkdir
-from os.path import join
+import os
 
 def new_directory(dir_name, dir_location):
     """
@@ -12,12 +10,12 @@ def new_directory(dir_name, dir_location):
     new_dir_name: location inside the new target directory
     """
     # check if folder exists
-    if dir_name in listdir(dir_location):
+    if os.path.exists(os.path.join(dir_location, dir_name)):
         print(f"Using existing folder {dir_name}/")
-        return join(dir_location, dir_name)
+        return os.path.join(dir_location, dir_name)
     else:
-        new_dir_name = join(dir_location, dir_name)
-        mkdir(new_dir_name)
+        new_dir_name = os.path.join(dir_location, dir_name)
+        os.mkdir(new_dir_name)
         print(f"Created new folder {dir_name}/")
 
     return new_dir_name

@@ -1,6 +1,5 @@
 import cv2
-from sys import argv
-
+import argparse
 
 def draw_bbox(frame, classId, left, top, right, bottom):
     # Draw a bounding box.
@@ -26,7 +25,6 @@ def draw_bbox(frame, classId, left, top, right, bottom):
 
 def show_image(name):
     gt_base = "./"
-    name = "00077"
     textfilename = name + ".txt"
     img_path = name + ".jpg"
     frame_orig = cv2.imread(img_path)
@@ -50,6 +48,9 @@ def show_image(name):
 
 
 if __name__ == "__main__":
-    name = argv[1]
+    parser = argparse.ArgumentParser()
+    parser.add_argument('name', help="name of the image to display",
+                        type=str)
+    args = parser.parse_args()
 
-    show_image(name)
+    show_image(args.name)

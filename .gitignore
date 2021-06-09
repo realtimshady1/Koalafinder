@@ -5,6 +5,10 @@ darknet
 tools/
 data/
 
+# Created files
+test.txt
+train.txt
+valid.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

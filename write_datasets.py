@@ -13,7 +13,7 @@ def write_datasets(args):
     extensions = []
     images = []
     # check extension of files in folder:
-    for filename in os.scandir(args.yolodataset):
+    for filename in os.scandir(args.source):
         title, ext = os.path.splitext(filename.name)
         if ext != ".txt":
             extensions.append(ext)
@@ -22,10 +22,10 @@ def write_datasets(args):
     extension = max(ext_dict, key=ext_dict.get)
     print("Your image file extension is: " + extension)
 
-    for filename in os.listdir(args.yolodataset):
+    for filename in os.listdir(args.source):
         _, ext = os.path.splitext(os.path.basename(filename))
         if ext == extension:
-            images.append(os.path.join(args.yolodataset, filename))
+            images.append(os.path.join(args.source, filename))
 
     number_of_images = len(images)
 
@@ -39,14 +39,14 @@ def write_datasets(args):
 
     print('Number of images:', number_of_images)
 
-    with open('train.txt', mode='w') as f:
+    with open(os.path.join(args.target,'train.txt'), mode='w') as f:
         for item in trainfiles:
             f.write(item + "\n")
 
-    with open('valid.txt', mode='w') as f:
+    with open(os.path.join(args.target,'valid.txt'), mode='w') as f:
         for item in validfiles:
             f.write(item + "\n")
-    with open('test.txt', mode='w') as f:
+    with open(os.path.join(args.target,'test.txt'), mode='w') as f:
         for item in testfiles:
             f.write(item + "\n")
     print('Number of images used for training', str(len(trainfiles)))
@@ -60,8 +60,10 @@ if __name__ == '__main__':
                         type=int)
     parser.add_argument('valid_pct', help="percentage of images to be used for validation, the rest are used for training and testing",
                         type=int)
-    parser.add_argument('yolodataset', help="path to directory with images and yolo annotations",
+    parser.add_argument('source', help="path to directory with images and yolo annotations",
                         type=str)
+    parser.add_argument('target', help="path to directory to save the generated outputs",
+                        type=str, default=os.getcwd())
     args = parser.parse_args()
 
     write_datasets(args)
