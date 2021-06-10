@@ -1,6 +1,6 @@
 # Koalafinder
 
-A YOLOv4 based solution for detecting koalas
+A YOLOv4 based solution for detecting koalas in thermal imaging
 
 ## Installation
 
