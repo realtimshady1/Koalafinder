@@ -62,8 +62,8 @@ if __name__ == '__main__':
                         type=int)
     parser.add_argument('source', help="path to directory with images and yolo annotations",
                         type=str)
-    parser.add_argument('target', help="path to directory to save the generated outputs",
-                        type=str, default=os.getcwd())
+    parser.add_argument('-target', help="path to directory to save the generated outputs",
+                        type=str, default='./')
     args = parser.parse_args()
 
     write_datasets(args)

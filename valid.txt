@@ -1,8 +1,0 @@
-data/obj/00043.jpg
-data/obj/00064.jpg
-data/obj/00085.jpg
-data/obj/00065.jpg
-data/obj/00048.jpg
-data/obj/00040.jpg
-data/obj/00002.jpg
-data/obj/00029.jpg
