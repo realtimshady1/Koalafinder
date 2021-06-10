@@ -11,7 +11,7 @@ sudo apt update
 sudo apt install python3 python3-pip
 git clone https://github.com/realtimshady1/Koalafinder.git
 cd Koalafinder
-pip install -r --upgrade requirementts.txt
+pip3 install --upgrade -r requirements.txt
 
 ```
 
@@ -69,21 +69,24 @@ Component | Version
 --- | --- 
 GPU | Tesla T4 
 CUDA | 11.0
-NVCC | 11.0.221    
+NVCC | 11.0.221  
+cuDNN | 8.0.5  
+OpenCV | 3.2.0
  
 
 ```bash
-cd ~
 git clone https://github.com/AlexeyAB/darknet
 cd darknet
 sed -i 's/OPENCV=0/OPENCV=1/' Makefile
 sed -i 's/GPU=0/GPU=1/' Makefile
 sed -i 's/CUDNN=0/CUDNN=1/' Makefile
-sed -i 's/CUDNN_HALF=0/CUDNN_HALF=1/' Makefile
+sed -i 's/CUDNN_HALF=0/CUDNN_H ALF=1/' Makefile
 
 sudo make
 cp darknet ../Koalafinder/
 ```
+
+> Build errors attributed to `/bin/sh: 1: nvcc: not found` can be fixed by directing `NVCC=nvcc` to the location of CUDA's NVCC location
 
 ### Config
 
@@ -103,15 +106,36 @@ filters = (# of classes + 5) * 3
 
 ```
 
-## Train
+## Usage
 
-Run the following command to train 
+### Train
+
+Train the neural network
 
 ```bash
-cd ~/Koalafinder/
-!./darknet detector train obj.data yolov4-tiny.cfg yolov4-tiny.conv.29 -dont_show -ext_output -map
+./darknet detector train obj.data yolov4-tiny.cfg yolov4-tiny.conv.29 -dont_show -ext_output -map
 
 ```
+
+### Evaluate
+
+Evaluate the neural network on the test dataset
+
+```bash
+./darknet detector map obj.data yolov4-tiny.cfg backup/yolov4-tiny_best.weights -points 0
+
+```
+
+### Test
+
+Test the neural network on one image. This should be one from the test.txt dataset
+
+```bash
+./darknet detector test obj.data yolov4-tiny.cfg backup/yolov4-tiny_best.weights data/obj/00001.jpg -ext_output
+
+```
+
+The 
 
 ## Progress
 
