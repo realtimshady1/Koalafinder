@@ -4,7 +4,6 @@ darknet
 # Data files
 tools/
 data/
-backup/*
 
 # Created files
 test.txt
