@@ -27,7 +27,7 @@ pip3 install --upgrade -r requirements.txt
 
 ### Dataset
 
-The koala data needs to be downloaded into the `data/` folder along with the annotations in the following structure
+The koala data needs to be downloaded from the [Google Drive](https://drive.google.com/drive/folders/1v_w4-pkDTD1CF5tU2WWyccbrTg-8ra98?usp=sharing) into a new `obj` folder the `data/` folder along with the annotations in the following structure
 
 ```bash
 
