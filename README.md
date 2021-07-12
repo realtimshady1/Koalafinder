@@ -81,9 +81,11 @@ sed -i 's/OPENCV=0/OPENCV=1/' Makefile
 sed -i 's/GPU=0/GPU=1/' Makefile
 sed -i 's/CUDNN=0/CUDNN=1/' Makefile
 sed -i 's/CUDNN_HALF=0/CUDNN_HALF=1/' Makefile
+sed -i 's/LIBSO=0/LIBSO=1/' Makefile
 
 sudo make
 cp darknet ../Koalafinder/
+cp libdarknet.so ../Koalafinder/
 ```
 
 > Build errors attributed to `/bin/sh: 1: nvcc: not found` can be fixed by directing `NVCC=nvcc` to the location of CUDA's NVCC location
@@ -108,9 +110,9 @@ filters = (# of classes + 5) * 3
 
 ## Usage
 
-### Train
+### Training
 
-Train the neural network
+Training the neural network can be completed using 
 
 ```bash
 ./darknet detector train obj.data yolov4-tiny.cfg yolov4-tiny.conv.29 -dont_show -ext_output -map
@@ -136,6 +138,13 @@ Test the neural network on one image. This should be one from the test.txt datas
 ```
 
 The neural network will generate a `predictions.jpg` file as the output
+
+### Inference
+
+To perform inference on a test image
+```bash
+python3 yolov4_inference.py yolov4-tiny.cfg obj.data yolov4-tiny.weights data/obj/00001.jpg
+```
 
 ## Progress
 
