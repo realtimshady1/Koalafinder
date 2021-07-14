@@ -60,7 +60,7 @@ def yolov4_inference(args):
 
     # save the final image
     print(f'Image saved to {args.output}')
-    cv2.imsave(args.output, image)
+    cv2.imwrite(args.output, image)
 
 
 if __name__ == "__main__":
