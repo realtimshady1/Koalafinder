@@ -8,19 +8,17 @@ A YOLOv4 based solution for detecting koalas in thermal imaging
 
 ```bash
 sudo apt update
-sudo apt install python3 python3-pip
+sudo apt install python3
+python3 -m pip install --upgrade pip
 git clone https://github.com/realtimshady1/Koalafinder.git
 cd Koalafinder
-pip3 install --upgrade -r requirements.txt
+python3 -m pip install --upgrade -r requirements.txt
 
 ```
 
-## Scripts
+## Labelling
 
-`write_bbox_txt.py`: generate bbox text from a csv file using [UltimateLabeling](https://github.com/alexandre01/UltimateLabeling/tree/master/ultimatelabeling)
-
-`write_datasets.py`: generate train/validate/text text files for splitting the images
-
+The program that is used for labelling can be installed through the following repository [DarkLabel](https://github.com/darkpgmr/DarkLabel)
 
 
 ## Setup
@@ -85,6 +83,7 @@ sed -i 's/LIBSO=0/LIBSO=1/' Makefile
 
 sudo make
 cp darknet ../Koalafinder/
+cp darknet.py ../Koalafinder/
 cp libdarknet.so ../Koalafinder/
 ```
 
@@ -144,6 +143,11 @@ The neural network will generate a `predictions.jpg` file as the output
 To perform inference on a test image
 ```bash
 python3 yolov4_inference.py yolov4-tiny.cfg obj.data yolov4-tiny.weights data/obj/00001.jpg
+```
+
+To perform inference on a test video
+```bash
+python3 yolov4_video.py yolov4-tiny.cfg obj.data yolov4-tiny.weights data/DJI_0036.MP4
 ```
 
 ## Progress
