@@ -72,12 +72,12 @@ def yolov4_video(args):
 
             # apply bounding boxes to the image
             cv2.rectangle(frame, (left, top), (right, bottom),
-                          class_colors[label], 2)
+                          (255,255,255), 2)
 
             # apply text box to the image
             cv2.putText(frame, "{} [{:.2f}]".format(label, float(confidence)),
                         (left, top - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
-                        class_colors[label], 2)
+                        (255,255,255), 2)
 
         # Write that frame into output video
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
