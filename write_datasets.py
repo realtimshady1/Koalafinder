@@ -4,7 +4,7 @@ import random
 from collections import Counter
 
 '''
-Courtesy of GotG@Github.com
+Creditted to GotG@Github.com
 https://github.com/GotG/yolotinyv3_medmask_demo
 '''
 
