@@ -1,6 +1,5 @@
 import os
 import argparse
-import random
 from collections import Counter
 
 '''
@@ -30,12 +29,10 @@ def write_datasets(args):
     number_of_images = len(images)
 
     index_valid = round(number_of_images * args.valid_pct / 100)
-    validfiles = random.sample(images, index_valid)
-    traintestfiles = list(set(images).difference(set(validfiles)))
-    index_train = round(len(traintestfiles) *
-                        (args.train_pct / (100 - args.valid_pct)))
-    trainfiles = random.sample(traintestfiles, index_train)
-    testfiles = list(set(traintestfiles).difference(set(trainfiles)))
+    index_train = round(number_of_images * args.train_pct / 100)
+    validfiles = images[:index_valid]
+    trainfiles = images[index_valid:(index_valid+index_train)]
+    testfiles = images[(index_valid+index_train):]
 
     print('Number of images:', number_of_images)
 
