@@ -1,9 +1,6 @@
 # Built files
 darknet
 
-# Data files
-data/
-
 # Created files
 test.txt
 train.txt

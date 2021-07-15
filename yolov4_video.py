@@ -5,6 +5,9 @@ from time import time
 
 
 def yolov4_video(args):
+    # Video output Frame per second
+    FPS = 30.0 
+    
     # load in our YOLOv4 architecture network
     network, class_names, class_colors = dn.load_network(args.config,
                                                          args.data,
@@ -26,7 +29,7 @@ def yolov4_video(args):
 
     # set out for video writer
     out = cv2.VideoWriter(
-        args.output, cv2.VideoWriter_fourcc(*"MJPG"), 10.0,
+        args.output, cv2.VideoWriter_fourcc(*"MJPG"), FPS,
         (frame_width, frame_height))
 
     # Calculate ratio to convert from frame to yolo input window
@@ -41,7 +44,7 @@ def yolov4_video(args):
     print("Starting the YOLO loop...")
 
     # load the input frame and write output frame.
-    for i in range(1, 1000):
+    while True:
         prev_time = time()
 
         # capture frame and return true if frame present

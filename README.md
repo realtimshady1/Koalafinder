@@ -7,7 +7,7 @@ A YOLOv4 based solution for detecting koalas in thermal imaging
 ### Ubuntu 18.04
 
 ```bash
-sudo apt update
+sudo apt update && upgrade
 sudo apt install python3
 python3 -m pip install --upgrade pip
 git clone https://github.com/realtimshady1/Koalafinder.git
@@ -31,17 +31,18 @@ The koala data needs to be downloaded from the [Google Drive](https://drive.goog
 ```bash
 
 └───data
+    ├───DJI_0026.MP4
     └───obj
-        ├───00001.jpg
-        ├───00001.txt
-        ├───00002.jpg
-        ├───00002.txt
+        ├───DJI_0026_00001.jpg
+        ├───DJI_0026_00001.txt
+        ├───DJI_0026_00002.jpg
+        ├───DJI_0026_00002.txt
         └───...
 
 ```
 The training data split files `[test.txt train.txt valid.txt]` are generated using the `write_dataset.py` script
 ```bash
-python3 write_datasets.py 60 20 data/obj
+python3 write_datasets.py 70 15 data/obj
 ```
 
 ### YOLOv4
@@ -88,7 +89,7 @@ cp darknet.py ../Koalafinder/
 cp libdarknet.so ../Koalafinder/
 ```
 
-> Build errors attributed to `/bin/sh: 1: nvcc: not found` can be fixed by directing `NVCC=nvcc` to the location of CUDA's NVCC location
+> Build errors attributed to `/bin/sh: 1: nvcc: not found` can be fixed by directing `NVCC=nvcc` to the location of CUDA's NVCC location. Usually `nvcc` is stored at `/usr/local/cuda/bin/nvcc`
 
 ### Config
 
@@ -100,8 +101,8 @@ The following is a recommendation on how best to tune the YOLO model configurati
 
 batch = 64
 subdivisions = 1
-width = 416 but anything divisible 32 is fine
-height = 416 the same as width
+width = 512 but anything divisible by 32 is fine
+height = 512 the same as width
 max_batches = (# of classes) * 2000 but no less than 4000
 steps = (80% of max_batches), (90% of max_batches)
 filters = (# of classes + 5) * 3
@@ -133,7 +134,7 @@ Evaluate the neural network on the test dataset
 Test the neural network on one image. This should be one from the test.txt dataset
 
 ```bash
-./darknet detector test obj.data yolov4-tiny.cfg backup/yolov4-tiny_best.weights data/obj/00001.jpg -ext_output
+./darknet detector test obj.data yolov4-tiny.cfg backup/yolov4-tiny_best.weights data/obj/DJI_0026_00001.jpg -ext_output
 
 ```
 
@@ -143,12 +144,12 @@ The neural network will generate a `predictions.jpg` file as the output
 
 To perform inference on a test image
 ```bash
-python3 yolov4_inference.py yolov4-tiny.cfg obj.data yolov4-tiny.weights data/obj/00001.jpg
+python3 yolov4_image.py yolov4-tiny.cfg obj.data backup/yolov4-tiny_best.weights data/obj/DJI_0026_00001.jpg
 ```
 
 To perform inference on a test video
 ```bash
-python3 yolov4_video.py yolov4-tiny.cfg obj.data yolov4-tiny.weights data/DJI_0036.MP4
+python3 yolov4_video.py yolov4-tiny.cfg obj.data backup/yolov4-tiny_best.weights data/DJI_0026.MP4
 ```
 
 ## Progress
