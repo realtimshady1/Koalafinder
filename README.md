@@ -20,6 +20,7 @@ python3 -m pip install --upgrade -r requirements.txt
 
 The program that is used for labelling can be installed through the following repository [DarkLabel](https://github.com/darkpgmr/DarkLabel)
 
+Otherwise, a pre-configured executable is available in the 	`tools/` folder
 
 ## Setup
 
@@ -91,7 +92,7 @@ cp libdarknet.so ../Koalafinder/
 
 ### Config
 
-A config file is needed to run the YOLO model and the parameters can be modified to suit each differen application
+A config file is needed to run the YOLO model and the parameters can be modified to suit each different application
 
 The following is a recommendation on how best to tune the YOLO model configuration
 
