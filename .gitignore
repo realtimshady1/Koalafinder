@@ -1,5 +1,7 @@
 # Built files
 darknet
+darknet.py
+libdarknet.so
 
 # Created files
 test.txt
@@ -16,7 +18,6 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-build/
 develop-eggs/
 dist/
 downloads/

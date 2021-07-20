@@ -26,12 +26,13 @@ def write_datasets(args):
         if ext == extension:
             images.append(os.path.join(args.source, filename))
 
+    images.sort()
     number_of_images = len(images)
 
     index_valid = round(number_of_images * args.valid_pct / 100)
     index_train = round(number_of_images * args.train_pct / 100)
-    validfiles = images[:index_valid]
-    trainfiles = images[index_valid:(index_valid+index_train)]
+    validfiles = images[:index_train]
+    trainfiles = images[index_train:(index_valid+index_train)]
     testfiles = images[(index_valid+index_train):]
 
     print('Number of images:', number_of_images)
