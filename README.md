@@ -7,7 +7,7 @@ A YOLOv4 based solution for detecting koalas in thermal imaging
 ### Ubuntu 18.04
 
 ```bash
-sudo apt update && upgrade
+sudo apt update
 sudo apt install python3
 python3 -m pip install --upgrade pip
 git clone https://github.com/realtimshady1/Koalafinder.git
@@ -63,7 +63,7 @@ nvidia-smi
 
 To build YOLOv4 to run as the primary object detector, we need to clone [AlexyAB@github](https://github.com/AlexeyAB)'s darknet repository and build according to their instructions. This is necessary so that YOLOv4 can run efficiently on your specific machine.
 
-For the sake of convenience, a pre-built YOLOv4 is available in the `darknet/` folder according to the following specifications. Thus if your environment meets the following constraints, you may skip the **Build** step.
+For the sake of convenience, a pre-built YOLOv4 is available in the `build/` folder according to the following specifications. Thus if your environment meets the following constraints, you may skip the **Build** step.
 
 Component | Version
 --- | --- 
@@ -76,24 +76,24 @@ OpenCV | 3.2.0
 
 ```bash
 # Build
-git clone https://github.com/AlexeyAB/darknet
-cd darknet
+git clone https://github.com/AlexeyAB/darknet build
+cd build
 sed -i 's/OPENCV=0/OPENCV=1/' Makefile
 sed -i 's/GPU=0/GPU=1/' Makefile
 sed -i 's/CUDNN=0/CUDNN=1/' Makefile
 sed -i 's/CUDNN_HALF=0/CUDNN_HALF=1/' Makefile
 sed -i 's/LIBSO=0/LIBSO=1/' Makefile
 sudo make
+cd ../
 ```
 
 Copy the files to the working directory
 
 ```bash
 # Copy files
-cp darknet ../Koalafinder/
-cp darknet.py ../Koalafinder/
-cp libdarknet.so ../Koalafinder/
-cd ../
+cp build/darknet ./
+cp build/darknet.py ./
+cp build/libdarknet.so ./
 ```
 
 > Build errors attributed to `/bin/sh: 1: nvcc: not found` can be fixed by directing `NVCC=nvcc` to the location of CUDA's NVCC location. Usually `nvcc` is stored at `/usr/local/cuda/bin/nvcc`
@@ -123,7 +123,7 @@ filters = (# of classes + 5) * 3
 Training the neural network can be completed using 
 
 ```bash
-./darknet detector train obj.data yolov4-tiny.cfg yolov4-tiny.conv.29 -dont_show -ext_output -map
+./darknet detector train obj.data yolov4-tiny.cfg backup/yolov4-tiny.conv.29 -dont_show -ext_output -map
 
 ```
 
@@ -156,7 +156,7 @@ python3 yolov4_image.py yolov4-tiny.cfg obj.data backup/yolov4-tiny_best.weights
 
 To perform inference on a test video
 ```bash
-python3 yolov4_video.py yolov4-tiny.cfg obj.data backup/yolov4-tiny_best.weights data/DJI_0026.MP4
+python3 yolov4_video.py yolov4-tiny.cfg obj.data backup/yolov4-tiny_best.weights data/DJI_0026.MP4 -post_process True
 ```
 
 ## Progress
