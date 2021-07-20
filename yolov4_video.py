@@ -3,6 +3,8 @@ import argparse
 import darknet as dn
 from time import time
 
+from post_process import post_process
+
 
 def yolov4_video(args):
     # Video output Frame per second
@@ -28,9 +30,10 @@ def yolov4_video(args):
     frame_height = int(cap.get(4))
 
     # set out for video writer
-    out = cv2.VideoWriter(
-        args.output, cv2.VideoWriter_fourcc(*"MJPG"), FPS,
-        (frame_width, frame_height))
+    out = cv2.VideoWriter(args.output,
+                          cv2.VideoWriter_fourcc(*"MJPG"),
+                          FPS,
+                          (frame_width, frame_height))
 
     # Calculate ratio to convert from frame to yolo input window
     width_ratio = frame_width / width
@@ -42,7 +45,10 @@ def yolov4_video(args):
     # start the timer
     start = time()
     print("Starting the YOLO loop...")
-
+    
+    # initialize the loop for the first frame
+    prev_detections = ([], [])
+    
     # load the input frame and write output frame.
     while True:
         prev_time = time()
@@ -51,12 +57,12 @@ def yolov4_video(args):
         ret, frame = cap.read()
 
         # check if frame present otherwise break the while loop
-        if not ret:
-            break
+        if not ret: break
 
         # convert frame into RGB from BGR and resize accordingly
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        resized = cv2.resize(frame, (width, height),
+        resized = cv2.resize(frame,
+                             (width, height),
                              interpolation=cv2.INTER_LINEAR).tobytes()
 
         # copy that frame bytes to darknet_image
@@ -64,9 +70,12 @@ def yolov4_video(args):
 
         # detection occurs at this line and return detections
         detections = dn.detect_image(network, class_names, image)
+        
+        # post process the detections to find new detections
+        detections = post_process(detections, prev_detections)
 
         # cycle through the positive detections
-        for label, confidence, bbox in detections:
+        for confidence, bbox in detections:
             left, top, right, bottom = dn.bbox2points(bbox)
             left = int(left * width_ratio)
             top = int(top * height_ratio)
@@ -74,14 +83,23 @@ def yolov4_video(args):
             bottom = int(bottom * height_ratio)
 
             # apply bounding boxes to the image
-            cv2.rectangle(frame, (left, top), (right, bottom),
-                          (255,255,255), 2)
+            cv2.rectangle(frame,
+                          (left, top),
+                          (right, bottom),
+                          (255,255,255),
+                          2)
 
             # apply text box to the image
-            cv2.putText(frame, "{} [{:.2f}]".format(label, float(confidence)),
-                        (left, top - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
-                        (255,255,255), 2)
-
+            cv2.putText(frame,
+                        "{} [{:.2f}]".format("Koala", float(confidence)),
+                        (left, top - 5),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+                        (255,255,255),
+                        2)
+        
+        # record the results to use for the next frame
+        prev_detections = detections
+        
         # Write that frame into output video
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         out.write(frame)

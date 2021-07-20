@@ -61,9 +61,9 @@ nvidia-smi
 
 #### Build
 
-A good tutorial for going through building darknet is by [DepthAI Tutorial: Training a Tiny YOLOv4 Object Detector with Your Own Data](https://colab.research.google.com/github/ibaiGorordo/Social-Distance-Feedback/blob/master/Part%202%20-%20Mask%20Detection/Face%20Mask%20Detection%20Inference%20Comparison/YOLOv4_tiny_Darknet_Mask_Detection.ipynb)
+To build YOLOv4 to run as the primary object detector, we need to clone [AlexyAB@github](https://github.com/AlexeyAB)'s darknet repository and build according to their instructions. This is necessary so that YOLOv4 can run efficiently on your specific machine.
 
-Otherwise, the outlined build method used the following component version setup
+For the sake of convenience, a pre-built YOLOv4 is available in the `darknet/` folder according to the following specifications. Thus if your environment meets the following constraints, you may skip the **Build** step.
 
 Component | Version
 --- | --- 
@@ -75,6 +75,7 @@ OpenCV | 3.2.0
  
 
 ```bash
+# Build
 git clone https://github.com/AlexeyAB/darknet
 cd darknet
 sed -i 's/OPENCV=0/OPENCV=1/' Makefile
@@ -82,11 +83,17 @@ sed -i 's/GPU=0/GPU=1/' Makefile
 sed -i 's/CUDNN=0/CUDNN=1/' Makefile
 sed -i 's/CUDNN_HALF=0/CUDNN_HALF=1/' Makefile
 sed -i 's/LIBSO=0/LIBSO=1/' Makefile
-
 sudo make
+```
+
+Copy the files to the working directory
+
+```bash
+# Copy files
 cp darknet ../Koalafinder/
 cp darknet.py ../Koalafinder/
 cp libdarknet.so ../Koalafinder/
+cd ../
 ```
 
 > Build errors attributed to `/bin/sh: 1: nvcc: not found` can be fixed by directing `NVCC=nvcc` to the location of CUDA's NVCC location. Usually `nvcc` is stored at `/usr/local/cuda/bin/nvcc`
