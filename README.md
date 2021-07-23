@@ -76,6 +76,7 @@ OpenCV | 3.2.0
 
 ```bash
 # Build
+sudo rm -r build
 git clone https://github.com/AlexeyAB/darknet build
 cd build
 sed -i 's/OPENCV=0/OPENCV=1/' Makefile
@@ -87,6 +88,9 @@ sudo make
 cd ../
 ```
 
+> Build errors attributed to `/bin/sh: 1: nvcc: not found` can be fixed by directing `NVCC=nvcc` to the location of CUDA's NVCC location. Usually `nvcc` is stored at `/usr/local/cuda/bin/nvcc`
+
+
 Copy the files to the working directory
 
 ```bash
@@ -96,7 +100,6 @@ cp build/darknet.py ./
 cp build/libdarknet.so ./
 ```
 
-> Build errors attributed to `/bin/sh: 1: nvcc: not found` can be fixed by directing `NVCC=nvcc` to the location of CUDA's NVCC location. Usually `nvcc` is stored at `/usr/local/cuda/bin/nvcc`
 
 ### Config
 
