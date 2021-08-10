@@ -2,10 +2,11 @@ import cv2
 import argparse
 import darknet as dn
 import os
-from time import time
+import csv
 from threading import Thread
 from queue import Queue
 
+from utils import read_srt
 from post_process import post_process
 
 
@@ -92,10 +93,10 @@ def video_capture(frame_queue, darknet_image_queue):
 def inference(darknet_image_queue, detections_queue, fps_queue):
     while cap.isOpened():
         # read from queue
-        darknet_image = darknet_image_queue.get()
-
-        # start timer
-        prev_time = time()
+        try:
+            darknet_image = darknet_image_queue.get(timeout=1)
+        except:
+            break
 
         # perform detection
         detections = dn.detect_image(network,
@@ -104,21 +105,18 @@ def inference(darknet_image_queue, detections_queue, fps_queue):
                                      thresh=args.thresh)
 
         # save detections to output queue
-        detections_queue.put(detections)
-
-        # calculate fps
-        fps = int(1 / (time() - prev_time))
-        # fps_queue.put(fps)
-        print("FPS: {}".format(fps))
-
+        try:
+            detections_queue.put(detections, timeout=1)
+        except:
+            break
+        
         # clean up
-        dn.print_detections(detections, False)
         dn.free_image(darknet_image)
 
     cap.release()
 
 
-def drawing(frame_queue, detections_queue, fps_queue):
+def drawing(frame_queue, detections_queue):
     # set out for video writer
     fps = int(cap.get(cv2.CAP_PROP_FPS))
     video = cv2.VideoWriter(args.output,
@@ -128,21 +126,41 @@ def drawing(frame_queue, detections_queue, fps_queue):
 
     # initialize the loop for the first frame
     prev_detections = []
-
+    
+    # initialize timestamps
+    tstamp = 0
+    
+    # initialize csv log
+    f = open(os.path.splitext(os.path.basename(input_path))[0] + '.csv', 'w')
+    contents = read_srt(os.path.splitext(input_path)[0] + '.SRT')
+    writer = csv.writer(f)
+    header = ['Video Time', 'Label', 'Confidence', 'Bounding-box'] + contents[0].keys()
+    writer.writerow(header)
+    
+    # start inference loop
+    print("Inference started...")
     while cap.isOpened():
         # read from queue
         frame = frame_queue.get()
         detections = detections_queue.get()
-        # fps = fps_queue.get()
+        tstamp += 1
 
-        # post process the detections to find new detections
-        if args.post_process and len(detections) and len(prev_detections):
-            detections = post_process(detections, prev_detections)
-
-            # record the results to use for the next frame
-            prev_detections = detections
 
         if frame is not None:
+            # post process the detections to find new detections
+            if args.post_process and len(detections) and len(prev_detections):
+                detections = post_process(detections, prev_detections)
+    
+            # record the results to use for the next frame
+            prev_detections = detections
+            
+            # print positive detections
+            if len(detections):
+                print('{}s '.format(int(tstamp/30)))
+                for label, confidence, bbox in detections:
+                    print("\t{}: {}%".format('Koala', confidence))
+                    writer.writerow([tstamp/fps, 'Koala', confidence, bbox] + contents[tstamp].values())
+            
             for _, confidence, bbox in detections:
                 xy1, xy2 = convert_points(bbox)
 
@@ -152,7 +170,10 @@ def drawing(frame_queue, detections_queue, fps_queue):
                 # apply text box to the image
                 text = "{} [{:.2f}]".format("Koala", float(confidence))
                 cv2.putText(frame, text, (xy1[0], xy1[1] - 5),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+                            (255, 255, 255),
+                            2)
+                
 
             # show output window
             if args.show:
@@ -162,9 +183,11 @@ def drawing(frame_queue, detections_queue, fps_queue):
             if args.output is not None:
                 video.write(frame)
 
+    f.close()
     cap.release()
     video.release()
     cv2.destroyAllWindows()
+       
     print("Video Write Completed")
 
 
@@ -205,5 +228,4 @@ if __name__ == "__main__":
                                    detections_queue,
                                    fps_queue)).start()
     Thread(target=drawing, args=(frame_queue,
-                                 detections_queue,
-                                 fps_queue)).start()
+                                 detections_queue)).start()

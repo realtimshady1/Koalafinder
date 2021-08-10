@@ -10,14 +10,12 @@
 # extract the entire video length
 extract_all.sh [video_path]
 # or extract a snippet
-extract_all.sh [video_path] [start_time] [end_time]
 ```
 
 To use `extract_all.sh`, the following command is an example:
 
 ```bash
 extract_all.sh DJI_0036.MP4
-extract_all.sh DJI_0026.MP4 00:03:00 00:06:18
 ```
 
 
