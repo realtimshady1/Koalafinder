@@ -9,6 +9,7 @@ def write_file(file_details):
 
 def extract_csv(folder):
     file_list = [os.path.join(folder, file) for file in os.listdir(folder)]
+    extracted_list = []
     for file in file_list:
         if os.path.splitext(file)[1] == '.csv':
             folder = file.split('.')[0]
@@ -26,9 +27,12 @@ def extract_csv(folder):
             with mp.Pool(mp.cpu_count()) as p:
                 p.map(write_file, arr)
 
+            extracted_list.append(os.path.basename(file))
             print('Extracted: ', file)
         else:
             print('Skipped: ', file)
+
+    return extracted_list
 
 if __name__=='__main__':
     if len(sys.argv) > 1:
