@@ -66,13 +66,13 @@ To build YOLOv4 to run as the primary object detector, we need to clone [AlexyAB
 For the sake of convenience, a pre-built YOLOv4 is available in the `build/` folder according to the following specifications. Thus if your environment meets the following constraints, you may skip the **Build** step.
 
 Component | Version
---- | --- 
-GPU | Tesla T4 
+--- | ---
+GPU | Tesla T4
 CUDA | 11.0
 NVCC | 11.0.221  
 cuDNN | 8.0.5  
 OpenCV | 3.2.0
- 
+
 
 ```bash
 # Build
@@ -84,6 +84,7 @@ sed -i 's/GPU=0/GPU=1/' Makefile
 sed -i 's/CUDNN=0/CUDNN=1/' Makefile
 sed -i 's/CUDNN_HALF=0/CUDNN_HALF=1/' Makefile
 sed -i 's/LIBSO=0/LIBSO=1/' Makefile
+sed -i 's/NVCC=nvcc/NVCC=\/usr\/local\/cuda\/bin\/nvcc/' Makefile
 sudo make
 cd ../
 ```
@@ -123,7 +124,7 @@ filters = (# of classes + 5) * 3
 
 ### Training
 
-Training the neural network can be completed using 
+Training the neural network can be completed using
 
 ```bash
 ./darknet detector train obj.data yolov4-tiny.cfg backup/yolov4-tiny.conv.29 -dont_show -ext_output -map
@@ -167,6 +168,3 @@ python3 yolov4_video.py yolov4-tiny.cfg obj.data backup/yolov4-tiny_best.weights
 The most recent run example is shown here
 
 ![chart.png](chart.png)
-
-
-

@@ -2,7 +2,6 @@ import cv2
 import os
 import sys
 from tqdm import tqdm
-from time import time
 from threading import Thread
 from queue import Queue
 
@@ -18,27 +17,43 @@ def read_frames(frame_list, video_file, frames_queue):
         frames_queue.put(img)
 
 def write_frames(frame_list, folder, frames_queue):
-    for frame in tqdm(frame_list):
+    for frame in frame_list:
         img = frames_queue.get(timeout=1)
         cv2.imwrite(os.path.join(folder,str(frame).zfill(8))+'.jpg', img)
 
 
+def read_basename(name):
+    name = os.path.splitext(name)[0]
+    return int(name)
+
+
+def check_txt(name):
+    if str(name).split('.')[1]=='txt':
+        return True
+    return False
+
+
 def extract_frames(video_file, folder):
-    start_time = time()
     frames_queue = Queue(maxsize=1)
 
-    frame_list = sorted([int(os.path.splitext(frame)[0]) for frame in os.listdir(folder)])[:100]
+    frame_list = [read_basename(frame) for frame in os.listdir(folder) if check_txt(frame)]
+    frame_list = sorted(frame_list)[:100]
 
-    Thread(target=read_frames, args=(frame_list, video_file, frames_queue)).start()
-    Thread(target=write_frames, args=(frame_list, folder, frames_queue)).start()
+    t1 = Thread(target=read_frames, args=(frame_list, video_file, frames_queue))
+    t2 = Thread(target=write_frames, args=(frame_list, folder, frames_queue))
 
-    #print('Elapsed time: ', time()-start_time)
+    t1.start()
+    t2.start()
+
+    t1.join()
+    t2.join()
+
 
 if __name__=='__main__':
     if len(sys.argv) > 2:
         video_file = sys.argv[1]
         folder = sys.argv[2]
     else:
-        raise ValueError('Please specify the correct number of inputs')
+        raise ValueError('Please enter the correct number of inputs')
 
     extract_frames(video_file, folder)

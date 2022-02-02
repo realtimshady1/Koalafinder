@@ -37,5 +37,7 @@ def extract_csv(folder):
 if __name__=='__main__':
     if len(sys.argv) > 1:
         folder = sys.argv[1]
+    else:
+        raise ValueError('Please enter the correct number of inputs')
 
     extract_csv(folder)
