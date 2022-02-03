@@ -9,6 +9,9 @@ https://github.com/GotG/yolotinyv3_medmask_demo
 
 
 def write_datasets(train_pct, valid_pct, source, target):
+    train_pct = int(train_pct)
+    valid_pct = int(valid_pct)
+    
     # check extension of files in folder:
     images = glob(source + '/*/*.jpg')
 

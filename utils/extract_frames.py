@@ -37,7 +37,7 @@ def extract_frames(video_file, folder):
     frames_queue = Queue(maxsize=1)
 
     frame_list = [read_basename(frame) for frame in os.listdir(folder) if check_txt(frame)]
-    frame_list = sorted(frame_list)[:100]
+    frame_list = sorted(frame_list)
 
     t1 = Thread(target=read_frames, args=(frame_list, video_file, frames_queue))
     t2 = Thread(target=write_frames, args=(frame_list, folder, frames_queue))
