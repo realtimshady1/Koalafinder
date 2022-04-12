@@ -1,12 +1,12 @@
-import cv2
+from cv2 import VideoCapture, imwrite
 import os
-import sys
+from sys import argv
 from tqdm import tqdm
 from threading import Thread
 from queue import Queue
 
 def read_frames(frame_list, video_file, frames_queue):
-    cap = cv2.VideoCapture(video_file)
+    cap = VideoCapture(video_file)
     count = 0
     for frame in frame_list:
         if frame != count:
@@ -17,9 +17,9 @@ def read_frames(frame_list, video_file, frames_queue):
         frames_queue.put(img)
 
 def write_frames(frame_list, folder, frames_queue):
-    for frame in frame_list:
+    for frame in tqdm(frame_list):
         img = frames_queue.get(timeout=1)
-        cv2.imwrite(os.path.join(folder,str(frame).zfill(8))+'.jpg', img)
+        imwrite(os.path.join(folder,str(frame).zfill(8))+'.jpg', img)
 
 
 def read_basename(name):
@@ -50,10 +50,10 @@ def extract_frames(video_file, folder):
 
 
 if __name__=='__main__':
-    if len(sys.argv) > 2:
-        video_file = sys.argv[1]
-        folder = sys.argv[2]
+    if len(argv) > 2:
+        video_file = argv[1]
+        folder = argv[2]
     else:
-        raise ValueError('Please enter the correct number of inputs')
+        raise ValueError('Please enter the correct number of inputs\n1: Video File\n2: Frame Folder')
 
     extract_frames(video_file, folder)
