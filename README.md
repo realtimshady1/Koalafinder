@@ -2,9 +2,9 @@
 
 A YOLOv4 based solution for detecting koalas in thermal imaging
 
-## Installation
+## Setup
 
-### Ubuntu 18.04
+#### Ubuntu 18.04
 
 ```bash
 sudo apt update
@@ -16,27 +16,46 @@ python3 -m pip install --upgrade -r requirements.txt
 
 ```
 
-## Labelling
+#### Google Cloud
 
-The program that is used for labelling can be installed through the following repository [DarkLabel](https://github.com/darkpgmr/DarkLabel)
-
-Otherwise, a pre-configured executable is available in the 	`tools/` folder
-
-## Setup
-
-### Dataset
-
-The koala data needs to be downloaded from the [Google Drive](https://drive.google.com/drive/folders/1v_w4-pkDTD1CF5tU2WWyccbrTg-8ra98?usp=sharing) into a new `obj` folder the `data/` folder along with the annotations in the following structure
+Google cloud has pre-configured image called **Debian 10 based Deep Learning VM with CUDA 11.3 M89** to save time. Cloud environments should be reserved for training models.
 
 ```bash
+# Install packages
+sudo apt update
+sudo apt install -y python-pip3 apt-file libopencv-dev
+pip3 install -U setuptools
+pip3 install opencv-python
+sudo apt-file update
 
+# grab unrar
+wget https://www.rarlab.com/rar/rarlinux-x64-610.tar.gz
+tar -xvf rarlinux-x64-610.tar.gz
+cp rar/unrar /usr/bin/
+
+# define TOKEN
+git clone -b dev https://$TOKEN@github.com/realtimshady1/Koalafinder.git
+unrar e
+```
+
+## Dataset
+
+The derivation of koala data is slightly complicated can be downloaded from the [Google Drive](https://drive.google.com/drive/folders/1v_w4-pkDTD1CF5tU2WWyccbrTg-8ra98?usp=sharing). Image data is stored as the original videos  
+
+into a new `obj` folder the `data/` folder along with the annotations in the following structure
+
+```bash
 └───data
-    ├───DJI_0026.MP4
-    └───obj
-        ├───DJI_0026_00001.jpg
-        ├───DJI_0026_00001.txt
-        ├───DJI_0026_00002.jpg
-        ├───DJI_0026_00002.txt
+    ├───data.rar
+    ├───20210512_DJI_0026.MP4
+    ├───20210512_DJI_0026.csv
+    └───20210512_DJI_0026
+        ├───00000.jpg
+        ├───00000.txt
+        ├───00001.jpg
+        ├───00001.txt
+        ├───00002.jpg
+        ├───00002.txt
         └───...
 
 ```
@@ -66,13 +85,13 @@ To build YOLOv4 to run as the primary object detector, we need to clone [AlexyAB
 For the sake of convenience, a pre-built YOLOv4 is available in the `build/` folder according to the following specifications. Thus if your environment meets the following constraints, you may skip the **Build** step.
 
 Component | Version
---- | --- 
-GPU | Tesla T4 
+--- | ---
+GPU | Tesla T4
 CUDA | 11.0
 NVCC | 11.0.221  
 cuDNN | 8.0.5  
 OpenCV | 3.2.0
- 
+
 
 ```bash
 # Build
@@ -84,6 +103,7 @@ sed -i 's/GPU=0/GPU=1/' Makefile
 sed -i 's/CUDNN=0/CUDNN=1/' Makefile
 sed -i 's/CUDNN_HALF=0/CUDNN_HALF=1/' Makefile
 sed -i 's/LIBSO=0/LIBSO=1/' Makefile
+sed -i 's/NVCC=nvcc/NVCC=\/usr\/local\/cuda\/bin\/nvcc/' Makefile
 sudo make
 cd ../
 ```
@@ -108,7 +128,6 @@ A config file is needed to run the YOLO model and the parameters can be modified
 The following is a recommendation on how best to tune the YOLO model configuration
 
 ```python
-
 batch = 64
 subdivisions = 1
 width = 512 but anything divisible by 32 is fine
@@ -123,7 +142,7 @@ filters = (# of classes + 5) * 3
 
 ### Training
 
-Training the neural network can be completed using 
+Training the neural network can be completed using
 
 ```bash
 ./darknet detector train obj.data yolov4-tiny.cfg backup/yolov4-tiny.conv.29 -dont_show -ext_output -map
@@ -162,11 +181,38 @@ To perform inference on a test video
 python3 yolov4_video.py yolov4-tiny.cfg obj.data backup/yolov4-tiny_best.weights data/DJI_0026.MP4 -post_process True
 ```
 
+```bash
+# build YOLOv4
+rm -r build
+git clone https://github.com/AlexeyAB/darknet build
+cd build
+sed -i 's/OPENCV=0/OPENCV=1/' Makefile
+sed -i 's/GPU=0/GPU=1/' Makefile
+sed -i 's/CUDNN=0/CUDNN=1/' Makefile
+sed -i 's/CUDNN_HALF=0/CUDNN_HALF=1/' Makefile
+sed -i 's/LIBSO=0/LIBSO=1/' Makefile
+sed -i 's/NVCC=nvcc/NVCC=\/usr\/local\/cuda\/bin\/nvcc/' Makefile
+sudo make
+
+# copy build artefacts
+cd ../
+cp build/darknet ./
+cp build/darknet.py ./
+cp build/libdarknet.so ./
+
+# run training job
+./darknet detector train obj.data cfg/yolov4-csp-sam.cfg backup/yolov4-csp-sam.weights -dont_show -ext_output -map
+```
+
+## Labelling
+
+The program that is used for labelling can be installed through the following repository [DarkLabel](https://github.com/darkpgmr/DarkLabel)
+
+A pre-configured executable is also available in the 	`tools/` folder
+
+
 ## Progress
 
 The most recent run example is shown here
 
 ![chart.png](chart.png)
-
-
-
