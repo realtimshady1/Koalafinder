@@ -109,7 +109,7 @@ def inference(darknet_image_queue, detections_queue, fps_queue):
             detections_queue.put(detections, timeout=1)
         except:
             break
-        
+
         # clean up
         dn.free_image(darknet_image)
 
@@ -126,17 +126,17 @@ def drawing(frame_queue, detections_queue):
 
     # initialize the loop for the first frame
     prev_detections = []
-    
+
     # initialize timestamps
     tstamp = 0
-    
+
     # initialize csv log
     f = open(os.path.splitext(os.path.basename(input_path))[0] + '.csv', 'w')
     contents = read_srt(os.path.splitext(input_path)[0] + '.SRT')
     writer = csv.writer(f)
-    header = ['Video Time', 'Label', 'Confidence', 'Bounding-box'] + contents[0].keys()
+    header = ['Video Time', 'Label', 'Confidence', 'Bounding-box'] + list(contents[0].keys())
     writer.writerow(header)
-    
+
     # start inference loop
     print("Inference started...")
     while cap.isOpened():
@@ -150,17 +150,17 @@ def drawing(frame_queue, detections_queue):
             # post process the detections to find new detections
             if args.post_process and len(detections) and len(prev_detections):
                 detections = post_process(detections, prev_detections)
-    
+
             # record the results to use for the next frame
             prev_detections = detections
-            
+
             # print positive detections
             if len(detections):
                 print('{}s '.format(int(tstamp/30)))
                 for label, confidence, bbox in detections:
                     print("\t{}: {}%".format('Koala', confidence))
-                    writer.writerow([tstamp/fps, 'Koala', confidence, bbox] + contents[tstamp].values())
-            
+                    writer.writerow([tstamp/fps, 'Koala', confidence, bbox] + list(contents[tstamp].values()))
+
             for _, confidence, bbox in detections:
                 xy1, xy2 = convert_points(bbox)
 
@@ -173,7 +173,7 @@ def drawing(frame_queue, detections_queue):
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5,
                             (255, 255, 255),
                             2)
-                
+
 
             # show output window
             if args.show:
@@ -187,7 +187,7 @@ def drawing(frame_queue, detections_queue):
     cap.release()
     video.release()
     cv2.destroyAllWindows()
-       
+
     print("Video Write Completed")
 
 

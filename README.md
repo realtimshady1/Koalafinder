@@ -6,6 +6,8 @@ A YOLOv4 based solution for detecting koalas in thermal imaging
 
 #### Ubuntu 18.04
 
+Git will need to be pre-installed and configured for access. Ask Tim to be added to the repository user list.
+
 ```bash
 sudo apt update
 sudo apt install python3
@@ -31,24 +33,35 @@ sudo apt-file update
 # grab unrar
 wget https://www.rarlab.com/rar/rarlinux-x64-610.tar.gz
 tar -xvf rarlinux-x64-610.tar.gz
-cp rar/unrar /usr/bin/
+sudo cp rar/unrar /usr/bin/
 
-# define TOKEN
+# Clone private repository using Github Token
+TOKEN = ###Token ID### Ask Tim for access
 git clone -b dev https://$TOKEN@github.com/realtimshady1/Koalafinder.git
-unrar e
+cd Koalafinder/
+```
+
+Copying files from the compute engine to a local machine requires gcloud's CLI. Once configured, the following code is an example to copy files across in the local terminal:
+
+```bash
+gcloud compute scp biodiversityuav@instance-2:/home/biodiversityuav/Koalafinder/test.csv C:\Users\timot\Desktop\test.csv
+
 ```
 
 ## Dataset
 
-The derivation of koala data is slightly complicated can be downloaded from the [Google Drive](https://drive.google.com/drive/folders/1v_w4-pkDTD1CF5tU2WWyccbrTg-8ra98?usp=sharing). Image data is stored as the original videos  
+The derivation of koala data is slightly complicated can be downloaded from the [Google Drive](https://drive.google.com/drive/folders/1v_w4-pkDTD1CF5tU2WWyccbrTg-8ra98?usp=sharing). To download everything, use the following command:
 
-into a new `obj` folder the `data/` folder along with the annotations in the following structure
+```bash
+cp tools/download_data.sh data/
+cd data/
+./download_data.sh
+```
+
+Image data is stored as the original videos  into a new `obj` folder the `data/` folder along with the annotations in the following structure
 
 ```bash
 └───data
-    ├───data.rar
-    ├───20210512_DJI_0026.MP4
-    ├───20210512_DJI_0026.csv
     └───20210512_DJI_0026
         ├───00000.jpg
         ├───00000.txt
@@ -61,7 +74,7 @@ into a new `obj` folder the `data/` folder along with the annotations in the fol
 ```
 The training data split files `[test.txt train.txt valid.txt]` are generated using the `write_dataset.py` script
 ```bash
-python3 write_datasets.py 70 15 data/obj
+python3 write_datasets.py 70 15 data .
 ```
 
 ### YOLOv4
@@ -92,6 +105,7 @@ NVCC | 11.0.221
 cuDNN | 8.0.5  
 OpenCV | 3.2.0
 
+To create a new build, use the following set of commands. The Makefile will also need to be updated to reflect the GPU that is being used.
 
 ```bash
 # Build
@@ -135,8 +149,17 @@ height = 512 the same as width
 max_batches = (# of classes) * 2000 but no less than 4000
 steps = (80% of max_batches), (90% of max_batches)
 filters = (# of classes + 5) * 3
-
 ```
+
+### Anchor Points
+
+Custom anchor points can be calculated using the following command
+```bash
+./darknet detector calc_anchors obj.data -num_of_clusters 9 -width 512 -height 512
+```
+>*num_of_clusters*: refers to the number of bbox detection points which can be counted in each [yolo] tile in the config file.
+
+>Make sure the **write_datasets.py** datasets have been generated
 
 ## Usage
 
@@ -145,7 +168,7 @@ filters = (# of classes + 5) * 3
 Training the neural network can be completed using
 
 ```bash
-./darknet detector train obj.data yolov4-tiny.cfg backup/yolov4-tiny.conv.29 -dont_show -ext_output -map
+./darknet detector train obj.data cfg/yolov4-tiny.cfg backup/yolov4-tiny.conv.29 -dont_show -ext_output -map
 
 ```
 
@@ -154,7 +177,7 @@ Training the neural network can be completed using
 Evaluate the neural network on the test dataset
 
 ```bash
-./darknet detector map obj.data yolov4-tiny.cfg backup/yolov4-tiny_best.weights -points 0
+./darknet detector map obj.data cfg/yolov4-tiny.cfg backup/yolov4-tiny_best.weights -iou_thresh 0.50
 
 ```
 
@@ -163,7 +186,7 @@ Evaluate the neural network on the test dataset
 Test the neural network on one image. This should be one from the test.txt dataset
 
 ```bash
-./darknet detector test obj.data yolov4-tiny.cfg backup/yolov4-tiny_best.weights data/obj/DJI_0026_00001.jpg -ext_output
+./darknet detector test obj.data cfg/yolov4-tiny.cfg backup/yolov4-tiny_best.weights data/obj/DJI_0026_00001.jpg -ext_output
 
 ```
 
@@ -173,36 +196,14 @@ The neural network will generate a `predictions.jpg` file as the output
 
 To perform inference on a test image
 ```bash
-python3 yolov4_image.py yolov4-tiny.cfg obj.data backup/yolov4-tiny_best.weights data/obj/DJI_0026_00001.jpg
+python3 yolov4_image.py cfg/yolov4-tiny.cfg obj.data backup/yolov4-tiny_best.weights data/obj/DJI_0026_00001.jpg
 ```
 
 To perform inference on a test video
 ```bash
-python3 yolov4_video.py yolov4-tiny.cfg obj.data backup/yolov4-tiny_best.weights data/DJI_0026.MP4 -post_process True
+python3 yolov4_video.py cfg/yolov4-tiny.cfg obj.data backup/yolov4-tiny_best.weights data/DJI_0026.MP4 -post_process True
 ```
 
-```bash
-# build YOLOv4
-rm -r build
-git clone https://github.com/AlexeyAB/darknet build
-cd build
-sed -i 's/OPENCV=0/OPENCV=1/' Makefile
-sed -i 's/GPU=0/GPU=1/' Makefile
-sed -i 's/CUDNN=0/CUDNN=1/' Makefile
-sed -i 's/CUDNN_HALF=0/CUDNN_HALF=1/' Makefile
-sed -i 's/LIBSO=0/LIBSO=1/' Makefile
-sed -i 's/NVCC=nvcc/NVCC=\/usr\/local\/cuda\/bin\/nvcc/' Makefile
-sudo make
-
-# copy build artefacts
-cd ../
-cp build/darknet ./
-cp build/darknet.py ./
-cp build/libdarknet.so ./
-
-# run training job
-./darknet detector train obj.data cfg/yolov4-csp-sam.cfg backup/yolov4-csp-sam.weights -dont_show -ext_output -map
-```
 
 ## Labelling
 
