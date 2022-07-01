@@ -124,6 +124,8 @@ cd ../
 
 > Build errors attributed to `/bin/sh: 1: nvcc: not found` can be fixed by directing `NVCC=nvcc` to the location of CUDA's NVCC location. Usually `nvcc` is stored at `/usr/local/cuda/bin/nvcc`
 
+> Build errors attributed to `opencv2/core/version.hpp: No such file or directory` occur because `sudo apt install -y python-pip3 apt-file libopencv-dev` failed
+
 
 Copy the files to the working directory
 
